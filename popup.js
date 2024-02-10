@@ -3,6 +3,13 @@ document.addEventListener('DOMContentLoaded', function () {
   var tabsList = document.getElementById('tabsList');
   var currentSelectionIndex = -1;
 
+  let searchLimitTimestamp = undefined;
+
+  getSearchLimitDate().then((result) => {
+    console.log('promise end:', result);
+    searchLimitTimestamp = new Date(result).getTime();
+  });
+
   chrome.tabs.getCurrent(function (tab) {
     searchInput.focus();
   });
@@ -60,8 +67,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function getAllHistoryResults(query, callback) {
-    const HALF_YEAR = 6 * 30 * 24 * 60 * 60 * 1000;
-    var startTime = Date.now() - HALF_YEAR;
+    var startTime = searchLimitTimestamp;
     var endTime = Date.now();
     var resultsSoFar = [];
 
@@ -109,5 +115,13 @@ document.addEventListener('DOMContentLoaded', function () {
     return `chrome-extension://${
       chrome.runtime.id
     }/_favicon/?pageUrl=${encodeURIComponent(url)}&size=32`;
+  }
+
+  function getSearchLimitDate() {
+    return new Promise((resolve) => {
+      chrome.storage.local.get(['searchLimitDate'], function (result) {
+        resolve(result.searchLimitDate);
+      });
+    });
   }
 });
