@@ -3,18 +3,15 @@ document.addEventListener('DOMContentLoaded', function () {
   var tabsList = document.getElementById('tabsList');
   var currentSelectionIndex = -1;
 
-  // Zaznacz pole wyszukiwania po kliknięciu w ikonkę wtyczki
   chrome.tabs.getCurrent(function (tab) {
     searchInput.focus();
   });
 
-  // Obsługa zdarzenia wprowadzania tekstu w polu wyszukiwania
   searchInput.addEventListener('input', function () {
     var searchQuery = searchInput.value.trim().toLowerCase();
     searchTabs(searchQuery);
   });
 
-  // Obsługa zdarzenia naciśnięcia klawiszy strzałek
   searchInput.addEventListener('keydown', function (event) {
     if (event.key === 'ArrowUp') {
       navigateTabs('up');
@@ -25,35 +22,59 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  // Funkcja wyszukująca pasujące karty
   function searchTabs(query) {
-    // Wyczyść listę kart przed aktualizacją wyników wyszukiwania
     tabsList.innerHTML = '';
 
-    // Pobierz historię przeglądarki
-    chrome.history.search({ text: query }, function (results) {
+    getAllHistoryResults(query, function (results) {
       results.forEach(function (result, index) {
-        // Dodaj wyniki wyszukiwania do listy
-        var listItem = document.createElement('li');
-        var favicon = document.createElement('img');
-        favicon.classList.add('favicon');
-        favicon.src = 'chrome://favicon/' + result.url;
-        listItem.appendChild(favicon);
-        listItem.textContent = result.title;
-        listItem.setAttribute('data-url', result.url);
-        listItem.addEventListener('click', function () {
-          // Otwórz wybraną kartę po kliknięciu na niej
-          chrome.tabs.create({ url: result.url });
-        });
-        tabsList.appendChild(listItem);
+        if (
+          result.title.toLowerCase().includes(query) ||
+          result.url.toLowerCase().includes(query)
+        ) {
+          var listItem = document.createElement('li');
+          var favicon = document.createElement('img');
+          favicon.classList.add('favicon');
+          favicon.src = getFaviconUrl(result.url);
+          listItem.appendChild(favicon);
+
+          const title = document.createElement('span');
+          title.classList.add('title');
+          title.textContent = result.title;
+          listItem.appendChild(title);
+
+          const lastVisit = document.createElement('span');
+          lastVisit.classList.add('last-visit');
+          lastVisit.textContent = new Date(result.lastVisitTime).toLocaleDateString();
+          listItem.appendChild(lastVisit);
+
+          listItem.setAttribute('data-url', result.url);
+          listItem.addEventListener('click', function () {
+            chrome.tabs.create({ url: result.url });
+          });
+          tabsList.appendChild(listItem);
+        }
       });
 
-      // Zresetuj indeks wyboru, gdy lista zostanie zaktualizowana
       currentSelectionIndex = -1;
     });
   }
 
-  // Funkcja obsługująca nawigację w górę i w dół po liście
+  function getAllHistoryResults(query, callback) {
+    const HALF_YEAR = 6 * 30 * 24 * 60 * 60 * 1000;
+    var startTime = Date.now() - HALF_YEAR;
+    var endTime = Date.now();
+    var resultsSoFar = [];
+
+    chrome.history.search(
+      { text: query, startTime: startTime, endTime: endTime, maxResults: 1000 },
+      function (results) {
+        resultsSoFar = resultsSoFar.concat(results);
+
+        callback(resultsSoFar);
+      }
+    );
+  }
+
   function navigateTabs(direction) {
     var items = tabsList.querySelectorAll('li');
 
@@ -63,7 +84,6 @@ document.addEventListener('DOMContentLoaded', function () {
       currentSelectionIndex = Math.min(currentSelectionIndex + 1, items.length - 1);
     }
 
-    // Zaznacz wybrany element
     items.forEach(function (item, index) {
       if (index === currentSelectionIndex) {
         item.classList.add('active');
@@ -72,18 +92,22 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
 
-    // Przewiń do wybranego elementu
     if (items[currentSelectionIndex]) {
       items[currentSelectionIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }
 
-  // Funkcja otwierająca zaznaczoną kartę
   function openSelectedTab() {
     var selectedItem = tabsList.querySelector('li.active');
     if (selectedItem) {
       var url = selectedItem.getAttribute('data-url');
       chrome.tabs.create({ url: url });
     }
+  }
+
+  function getFaviconUrl(url) {
+    return `chrome-extension://${
+      chrome.runtime.id
+    }/_favicon/?pageUrl=${encodeURIComponent(url)}&size=32`;
   }
 });
