@@ -2,13 +2,15 @@
   "name": "recent-tabs-new",
   "version": "0.1.0",
   "description": "",
-  "main": "popup.js",
+  "source": "src/index.ts",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Adam Konopka",
   "license": "ISC",
   "devDependencies": {
-    "parcel": "^2.11.0"
+    "parcel": "^2.11.0",
+    "@parcel/config-webextension": "^2.11.0"
   }
 }

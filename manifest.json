@@ -3,7 +3,7 @@
   "name": "Recent Tabs Extension",
   "version": "1.0",
   "description": "Chrome extension for searching recently closed and history tabs with navigation using arrow keys.",
-  "permissions": ["tabs", "history", "favicon", "bookmarks", "storage"],
+  "permissions": ["tabs", "history", "favicon", "bookmarks", "sessions", "storage"],
   "background": {
     "service_worker": "background.js"
   },
