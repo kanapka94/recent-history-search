@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "description": "",
   "source": "src/index.ts",
-  "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "parcel watch src/manifest.json --host localhost --config @parcel/config-webextension",
+    "build": "parcel build src/manifest.json --config @parcel/config-webextension"
   },
   "author": "Adam Konopka",
   "license": "ISC",
