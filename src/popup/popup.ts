@@ -57,8 +57,18 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       });
 
+      if (results.length === 0) {
+        addNotFoundItem();
+      }
+
       currentSelectionIndex = -1;
     });
+  }
+
+  function addNotFoundItem() {
+    var notFoundItem = document.createElement('li');
+    notFoundItem.textContent = 'No results found';
+    tabsList.appendChild(notFoundItem);
   }
 
   function getAllHistoryResults(query, callback) {
@@ -77,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function navigateTabs(direction) {
-    var items = tabsList.querySelectorAll('li');
+    var items = tabsList.querySelectorAll('[role="option"]');
 
     if (direction === 'up') {
       currentSelectionIndex = Math.max(currentSelectionIndex - 1, 0);
@@ -121,10 +131,13 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function getListItem(item) {
-    var listItem = document.createElement('li');
-    var favicon = document.createElement('img');
+    const listItem = document.createElement('li');
+    listItem.setAttribute('role', 'option');
+
+    const favicon = document.createElement('img');
     favicon.classList.add('favicon');
     favicon.src = getFaviconUrl(item.url);
+
     listItem.appendChild(favicon);
 
     const title = document.createElement('span');
