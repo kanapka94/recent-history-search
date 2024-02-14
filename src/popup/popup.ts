@@ -2,6 +2,7 @@ import { formatDistance } from 'date-fns';
 
 document.addEventListener('DOMContentLoaded', function () {
   var searchInput = document.getElementById('searchInput');
+  const SettingsButton = document.getElementById('settings-button');
   var tabsList = document.getElementById('tabsList');
   var currentSelectionIndex = -1;
 
@@ -16,10 +17,12 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   function displayHistoryResults() {
-    chrome.history.search({ text: '', maxResults: 20 }, function (results) {
+    chrome.history.search({ text: '', maxResults: 30 }, function (results) {
       results.forEach(function (result) {
         tabsList.appendChild(getListItem(result));
       });
+
+      selectFirstTab();
     });
   }
 
@@ -28,6 +31,8 @@ document.addEventListener('DOMContentLoaded', function () {
   } catch (ex) {
     console.error(ex);
   }
+
+  SettingsButton.addEventListener('click', navigateToSettings);
 
   searchInput.addEventListener('input', function () {
     var searchQuery = searchInput.value.trim().toLowerCase();
@@ -53,25 +58,31 @@ document.addEventListener('DOMContentLoaded', function () {
           result.title.toLowerCase().includes(query) ||
           result.url.toLowerCase().includes(query)
         ) {
-          tabsList.appendChild(getListItem(result));
+          tabsList.appendChild(getListItem(result, query));
         }
       });
 
+      currentSelectionIndex = -1;
+
       if (results.length === 0) {
-        addNotFoundItem();
+        addNoResultsItem();
+        return;
       }
 
-      currentSelectionIndex = -1;
+      selectFirstTab();
     });
   }
 
-  function addNotFoundItem() {
+  function addNoResultsItem() {
     var notFoundItem = document.createElement('li');
+    notFoundItem.classList.add('no-results');
     notFoundItem.textContent = 'No results found';
     tabsList.appendChild(notFoundItem);
   }
 
-  function getAllHistoryResults(query, callback) {
+  type Callback = (results: chrome.history.HistoryItem[]) => void;
+
+  function getAllHistoryResults(query: string, callback: Callback) {
     var startTime = searchLimitTimestamp;
     var endTime = Date.now();
     var resultsSoFar = [];
@@ -110,9 +121,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function openSelectedTab() {
     var selectedItem = tabsList.querySelector('li.active');
+
     if (selectedItem) {
       var url = selectedItem.getAttribute('data-url');
       chrome.tabs.create({ url: url });
+    }
+  }
+
+  function selectFirstTab() {
+    var firstItem = tabsList.querySelector('li');
+
+    console.log(firstItem);
+
+    if (firstItem) {
+      currentSelectionIndex = 0;
+      firstItem.classList.add('active');
     }
   }
 
@@ -130,26 +153,45 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  function getListItem(item) {
+  function getListItem(item, query: string | undefined = undefined) {
     const listItem = document.createElement('li');
+    listItem.classList.add('list-item');
     listItem.setAttribute('role', 'option');
+
+    const Container = document.createElement('div');
+    Container.classList.add('container');
 
     const favicon = document.createElement('img');
     favicon.classList.add('favicon');
     favicon.src = getFaviconUrl(item.url);
 
-    listItem.appendChild(favicon);
+    Container.appendChild(favicon);
 
-    const title = document.createElement('span');
+    const Wrapper = document.createElement('div');
+    Wrapper.classList.add('wrapper');
+    Container.appendChild(Wrapper);
+
+    const title = document.createElement('p');
     title.classList.add('title');
-    title.textContent = item.title;
-    listItem.appendChild(title);
+    const sanitizedTitle = document.createElement('div');
+    sanitizedTitle.textContent = item.title;
+    title.innerHTML = !query
+      ? sanitizedTitle.innerHTML
+      : highlightText(sanitizedTitle.innerHTML, query);
+    Wrapper.appendChild(title);
 
-    const lastVisit = document.createElement('span');
+    const domain = document.createElement('p');
+    domain.classList.add('domain');
+    domain.textContent = new URL(item.url).hostname;
+    Wrapper.appendChild(domain);
+
+    const lastVisit = document.createElement('p');
     lastVisit.classList.add('last-visit');
     lastVisit.textContent = formatDistance(new Date(item.lastVisitTime), new Date(), {
       addSuffix: true,
     });
+
+    listItem.appendChild(Container);
     listItem.appendChild(lastVisit);
 
     listItem.setAttribute('data-url', item.url);
@@ -158,5 +200,18 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     return listItem;
+  }
+
+  function highlightText(text: string, searchTerm: string) {
+    var highlightedText = text.replace(
+      new RegExp(searchTerm, 'gi'),
+      "<span class='highlight'>" + searchTerm + '</span>'
+    );
+
+    return highlightedText;
+  }
+
+  function navigateToSettings() {
+    chrome.runtime.openOptionsPage();
   }
 });

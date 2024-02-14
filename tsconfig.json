@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
-    "types": ["chrome-types"]
+    "types": ["chrome-types"],
+    "lib": ["es2017", "dom"]
   }
 }
