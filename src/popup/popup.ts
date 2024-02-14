@@ -1,3 +1,5 @@
+import { formatDistance } from 'date-fns';
+
 document.addEventListener('DOMContentLoaded', function () {
   var searchInput = document.getElementById('searchInput');
   var tabsList = document.getElementById('tabsList');
@@ -6,7 +8,6 @@ document.addEventListener('DOMContentLoaded', function () {
   let searchLimitTimestamp = undefined;
 
   getSearchLimitDate().then((result) => {
-    console.log('promise end:', result);
     searchLimitTimestamp = new Date(result).getTime();
   });
 
@@ -14,40 +15,16 @@ document.addEventListener('DOMContentLoaded', function () {
     searchInput.focus();
   });
 
-  function displayRecentlyClosedTabs() {
-    chrome.sessions.getRecentlyClosed(function (sessions) {
-      sessions.forEach(function (session) {
-        console.log(session);
-        const result = session.tab;
-
-        var listItem = document.createElement('li');
-        var favicon = document.createElement('img');
-        favicon.classList.add('favicon');
-        favicon.src = getFaviconUrl(result.url);
-        listItem.appendChild(favicon);
-
-        const title = document.createElement('span');
-        title.classList.add('title');
-        title.textContent = result.title;
-        listItem.appendChild(title);
-
-        // const lastVisit = document.createElement('span');
-        // lastVisit.classList.add('last-visit');
-        // lastVisit.textContent = new Date(Date.now() - session.lastModified).toLocaleTimeString();
-        // listItem.appendChild(lastVisit);
-
-        listItem.setAttribute('data-url', result.url);
-        listItem.addEventListener('click', function () {
-          chrome.tabs.create({ url: result.url });
-        });
-
-        tabsList.appendChild(listItem);
+  function displayHistoryResults() {
+    chrome.history.search({ text: '', maxResults: 20 }, function (results) {
+      results.forEach(function (result) {
+        tabsList.appendChild(getListItem(result));
       });
     });
   }
 
   try {
-    displayRecentlyClosedTabs();
+    displayHistoryResults();
   } catch (ex) {
     console.error(ex);
   }
@@ -76,27 +53,7 @@ document.addEventListener('DOMContentLoaded', function () {
           result.title.toLowerCase().includes(query) ||
           result.url.toLowerCase().includes(query)
         ) {
-          var listItem = document.createElement('li');
-          var favicon = document.createElement('img');
-          favicon.classList.add('favicon');
-          favicon.src = getFaviconUrl(result.url);
-          listItem.appendChild(favicon);
-
-          const title = document.createElement('span');
-          title.classList.add('title');
-          title.textContent = result.title;
-          listItem.appendChild(title);
-
-          const lastVisit = document.createElement('span');
-          lastVisit.classList.add('last-visit');
-          lastVisit.textContent = new Date(result.lastVisitTime).toLocaleDateString();
-          listItem.appendChild(lastVisit);
-
-          listItem.setAttribute('data-url', result.url);
-          listItem.addEventListener('click', function () {
-            chrome.tabs.create({ url: result.url });
-          });
-          tabsList.appendChild(listItem);
+          tabsList.appendChild(getListItem(result));
         }
       });
 
@@ -161,5 +118,32 @@ document.addEventListener('DOMContentLoaded', function () {
         resolve(result.searchLimitDate);
       });
     });
+  }
+
+  function getListItem(item) {
+    var listItem = document.createElement('li');
+    var favicon = document.createElement('img');
+    favicon.classList.add('favicon');
+    favicon.src = getFaviconUrl(item.url);
+    listItem.appendChild(favicon);
+
+    const title = document.createElement('span');
+    title.classList.add('title');
+    title.textContent = item.title;
+    listItem.appendChild(title);
+
+    const lastVisit = document.createElement('span');
+    lastVisit.classList.add('last-visit');
+    lastVisit.textContent = formatDistance(new Date(item.lastVisitTime), new Date(), {
+      addSuffix: true,
+    });
+    listItem.appendChild(lastVisit);
+
+    listItem.setAttribute('data-url', item.url);
+    listItem.addEventListener('click', function () {
+      chrome.tabs.create({ url: item.url });
+    });
+
+    return listItem;
   }
 });

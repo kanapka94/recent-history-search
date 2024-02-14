@@ -1,21 +1,27 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f5f5f5;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+    Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   margin: 0;
   padding: 0;
+  display: flex;
+  height: 350px;
 }
 
 .container {
   width: 500px;
-  padding: 10px;
   background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-h2 {
-  font-size: 18px;
-  margin-bottom: 10px;
+.header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  padding: 8px 8px 0 8px;
+  background: linear-gradient(180deg, white, #ffffffa1);
 }
 
 input[type='text'] {
@@ -25,13 +31,14 @@ input[type='text'] {
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 14px;
-  box-sizing: border-box;
 }
 
-ul {
-  list-style-type: none;
+.list {
+  height: 350px;
+  margin: 50px 10px 10px;
   padding: 0;
-  margin: 0;
+  list-style-type: none;
+  overflow-y: auto;
 }
 
 li {
@@ -43,10 +50,11 @@ li {
 }
 
 .title {
+  width: 70%;
+  margin-right: 8px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-right: 8px;
 }
 
 li:hover {
@@ -65,7 +73,6 @@ li.active {
 
 /* this is last visit time */
 .last-visit {
-  width: 50px;
   font-size: 12px;
   color: #666;
   margin-left: auto;

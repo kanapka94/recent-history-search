@@ -1,17 +1,17 @@
-<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Recent Tabs Extension</title>
-    <link rel="stylesheet" href="./popup.css" />
+    <link rel="stylesheet" href="./popup.scss" />
   </head>
   <body>
     <div class="container">
-      <h2>Search Recent Tabs</h2>
-      <input type="text" id="searchInput" placeholder="Search closed tabs" />
-      <ul id="tabsList"></ul>
+      <header class="header">
+        <input type="text" id="searchInput" placeholder="Search closed tabs" />
+      </header>
+      <ul id="tabsList" class="list"></ul>
     </div>
-    <script src="./popup.ts"></script>
+    <script type="module" src="./popup.ts"></script>
   </body>
 </html>
