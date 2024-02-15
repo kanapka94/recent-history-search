@@ -6,10 +6,15 @@ document.addEventListener('DOMContentLoaded', function () {
   var tabsList = document.getElementById('tabsList');
   var currentSelectionIndex = -1;
 
-  let searchLimitTimestamp = undefined;
+  let startSearchTimestamp = undefined;
+  let endSearchTimestamp = undefined;
 
-  getSearchLimitDate().then((result) => {
-    searchLimitTimestamp = new Date(result).getTime();
+  getStartSearchDate().then((result) => {
+    startSearchTimestamp = new Date(result).getTime();
+  });
+
+  getEndSearchDate().then((result) => {
+    endSearchTimestamp = new Date(result).getTime();
   });
 
   chrome.tabs.getCurrent(function (tab) {
@@ -17,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   function displayHistoryResults() {
-    chrome.history.search({ text: '', maxResults: 30 }, function (results) {
+    chrome.history.search({ text: '', maxResults: 200 }, function (results) {
       results.forEach(function (result) {
         tabsList.appendChild(getListItem(result));
       });
@@ -83,12 +88,12 @@ document.addEventListener('DOMContentLoaded', function () {
   type Callback = (results: chrome.history.HistoryItem[]) => void;
 
   function getAllHistoryResults(query: string, callback: Callback) {
-    var startTime = searchLimitTimestamp;
+    var startTime = startSearchTimestamp;
     var endTime = Date.now();
     var resultsSoFar = [];
 
     chrome.history.search(
-      { text: query, startTime: startTime, endTime: endTime, maxResults: 100 },
+      { text: query, startTime: startTime, endTime: endTime, maxResults: 500 },
       function (results) {
         resultsSoFar = resultsSoFar.concat(results);
 
@@ -145,10 +150,18 @@ document.addEventListener('DOMContentLoaded', function () {
     }/_favicon/?pageUrl=${encodeURIComponent(url)}&size=32`;
   }
 
-  function getSearchLimitDate() {
+  function getStartSearchDate() {
     return new Promise((resolve) => {
-      chrome.storage.local.get(['searchLimitDate'], function (result) {
-        resolve(result.searchLimitDate);
+      chrome.storage.local.get(['startSearchDate'], function (result) {
+        resolve(result.startSearchDate);
+      });
+    });
+  }
+
+  function getEndSearchDate() {
+    return new Promise((resolve) => {
+      chrome.storage.local.get(['endSearchDate'], function (result) {
+        resolve(result.endSearchDate);
       });
     });
   }

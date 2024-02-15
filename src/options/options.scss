@@ -1,13 +1,49 @@
+body {
+  width: 700px;
+}
+
+.form {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.column {
+  flex: 1;
+}
+
+.label {
+  margin-top: 20px;
+  font-size: 16px;
+}
+
+.info {
+  margin-top: 0;
+  margin-bottom: 5px;
+  font-size: 12px;
+  color: #567;
+}
+
+.highlight {
+  color: #585858;
+  font-weight: bold;
+}
+
 .date-picker {
   width: 100%;
   padding: 8px;
-  margin: 10px 0;
+  margin: 10px 0 5px;
   border: 1px solid #ccc;
   border-radius: 4px;
   box-sizing: border-box;
+
+  &:hover,
+  &:focus {
+    border-color: #999;
+  }
 }
 
-#submit {
+.save-settings {
   width: 30%;
   padding: 8px;
   margin: 10px 0;
@@ -20,7 +56,16 @@
   cursor: pointer;
 
   &:active {
-    background-color: #51a881;
+    background-color: #448d6c;
     transform: scale(0.98);
   }
+
+  &:hover {
+    background-color: #448d6c;
+  }
+}
+
+.separator {
+  margin: 20px 0;
+  border-bottom: 1px solid #ccc;
 }
