@@ -48,8 +48,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     chrome.storage.local.get(['maxSearchResults'], function (result) {
-      console.log('from store', result.maxSearchResults);
-
       if (result.maxSearchResults) {
         maxSearchResultsInput.value = result.maxSearchResults;
       } else {
@@ -68,8 +66,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!maxSearchResultsInput.value) {
       maxSearchResultsInput.value = '500';
     }
-
-    console.log(maxSearchResultsInput.value);
 
     chrome.storage.local.set({ maxSearchResults: maxSearchResultsInput.value }).then(() => {});
   }

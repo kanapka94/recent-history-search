@@ -65,12 +65,7 @@ document.addEventListener('DOMContentLoaded', function () {
     tabsList.innerHTML = '';
 
     getAllHistoryResults(query, function (results) {
-      results.forEach(function (result, index) {
-        // if (
-        //   result.title.toLowerCase().includes(query) ||
-        //   result.url.toLowerCase().includes(query)
-        // ) {
-        // }
+      results.forEach(function (result) {
         tabsList.appendChild(getListItem(result, query));
       });
 
@@ -97,11 +92,6 @@ document.addEventListener('DOMContentLoaded', function () {
   function getAllHistoryResults(query: string, callback: Callback) {
     var startTime = startSearchTimestamp;
     var endTime = endSearchTimestamp;
-
-    console.log('start', startTime);
-    console.log('end', endTime);
-    console.log('max', searchMaxResults);
-    console.log('query', query);
 
     chrome.history.search(
       { text: query, startTime: startTime, endTime: endTime, maxResults: searchMaxResults },
