@@ -10,21 +10,42 @@
     <h2>Settings</h2>
 
     <form id="settings-form" class="form">
-      <div class="column">
-        <label for="start-search-date" class="label">Search from</label>
-        <input type="date" id="start-search-date" name="start-search-date" class="date-picker" />
-        <p class="info">Select the start date from which you want to display the results</p>
-        <p class="info">Default: <span class="highlight">1 year ago</span></p>
+      <div class="row">
+        <div class="column">
+          <label for="start-search-date" class="label">Search from</label>
+          <input type="date" id="start-search-date" name="start-search-date" class="date-picker" />
+          <p class="info">Select the start date from which you want to display the results</p>
+          <p class="info">Default: <span class="highlight">1 year ago</span></p>
+        </div>
+        <div class="column">
+          <label for="end-search-date" class="label">to</label>
+          <input type="date" id="end-search-date" name="end-search-date" class="date-picker" />
+          <p class="info">Select the end date by which you want to display the results.</p>
+          <p class="info">Default: <span class="highlight">today</span></p>
+        </div>
       </div>
-      <div class="column">
-        <label for="end-search-date" class="label">to</label>
-        <input type="date" id="end-search-date" name="end-search-date" class="date-picker" />
-        <p class="info">Select the end date by which you want to display the results.</p>
-        <p class="info">Default: <span class="highlight">today</span></p>
+
+      <div class="separator"></div>
+
+      <div class="row">
+        <div class="column">
+          <label for="search-max-results" class="label">Search max results</label>
+          <input
+            type="number"
+            class="number-input"
+            name="search-max-results"
+            placeholder="500"
+            id="max-search-results"
+          />
+          <p class="info">
+            Maximum number of results to display. If the number of results is greater than this
+            value, the oldest results will be removed.
+          </p>
+          <p class="info">Default: <span class="highlight">500</span></p>
+        </div>
+        <div class="column"></div>
       </div>
     </form>
-
-    <div class="separator"></div>
 
     <button type="submit" id="submit" class="save-settings" data-trigger="save-settings">
       Save

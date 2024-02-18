@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   let startSearchTimestamp = undefined;
   let endSearchTimestamp = undefined;
+  let searchMaxResults = undefined;
 
   getStartSearchDate().then((result) => {
     startSearchTimestamp = new Date(result).getTime();
@@ -17,26 +18,30 @@ document.addEventListener('DOMContentLoaded', function () {
     endSearchTimestamp = !result ? new Date().getTime() : new Date(result).getTime();
   });
 
+  getSearchMaxResults().then((result) => {
+    searchMaxResults = Number(result);
+  });
+
   chrome.tabs.getCurrent(function (tab) {
     searchInput.focus();
   });
 
   setButtonBadgeIfEndDateIsSet();
 
+  try {
+    displayHistoryResults();
+  } catch (ex) {
+    console.error(ex);
+  }
+
   function displayHistoryResults() {
-    chrome.history.search({ text: '', maxResults: 200 }, function (results) {
+    chrome.history.search({ text: '', maxResults: searchMaxResults }, function (results) {
       results.forEach(function (result) {
         tabsList.appendChild(getListItem(result));
       });
 
       selectFirstTab();
     });
-  }
-
-  try {
-    displayHistoryResults();
-  } catch (ex) {
-    console.error(ex);
   }
 
   SettingsButton.addEventListener('click', navigateToSettings);
@@ -61,12 +66,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     getAllHistoryResults(query, function (results) {
       results.forEach(function (result, index) {
-        if (
-          result.title.toLowerCase().includes(query) ||
-          result.url.toLowerCase().includes(query)
-        ) {
-          tabsList.appendChild(getListItem(result, query));
-        }
+        // if (
+        //   result.title.toLowerCase().includes(query) ||
+        //   result.url.toLowerCase().includes(query)
+        // ) {
+        // }
+        tabsList.appendChild(getListItem(result, query));
       });
 
       currentSelectionIndex = -1;
@@ -92,15 +97,15 @@ document.addEventListener('DOMContentLoaded', function () {
   function getAllHistoryResults(query: string, callback: Callback) {
     var startTime = startSearchTimestamp;
     var endTime = endSearchTimestamp;
-    var resultsSoFar = [];
+
+    console.log('start', startTime);
+    console.log('end', endTime);
+    console.log('max', searchMaxResults);
+    console.log('query', query);
 
     chrome.history.search(
-      { text: query, startTime: startTime, endTime: endTime, maxResults: 2000 },
-      function (results) {
-        resultsSoFar = resultsSoFar.concat(results);
-
-        callback(resultsSoFar);
-      }
+      { text: query, startTime: startTime, endTime: endTime, maxResults: searchMaxResults },
+      callback
     );
   }
 
@@ -138,8 +143,6 @@ document.addEventListener('DOMContentLoaded', function () {
   function selectFirstTab() {
     var firstItem = tabsList.querySelector('li');
 
-    console.log(firstItem);
-
     if (firstItem) {
       currentSelectionIndex = 0;
       firstItem.classList.add('active');
@@ -164,6 +167,14 @@ document.addEventListener('DOMContentLoaded', function () {
     return new Promise((resolve) => {
       chrome.storage.session.get(['endSearchDate'], function (result) {
         resolve(result.endSearchDate);
+      });
+    });
+  }
+
+  function getSearchMaxResults() {
+    return new Promise((resolve) => {
+      chrome.storage.local.get(['maxSearchResults'], function (result) {
+        resolve(result.maxSearchResults);
       });
     });
   }

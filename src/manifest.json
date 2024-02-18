@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Recent history search",
-  "version": "1.0",
-  "description": "Chrome extension for searching recently closed and history tabs with navigation using arrow keys.",
+  "version": "0.0.1",
+  "description": "Chrome extension for searching recently closed and history tabs with navigation using arrow keys and date filters.",
   "permissions": [
     "tabs",
     "history",

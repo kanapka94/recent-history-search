@@ -6,9 +6,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
   const startSearchDateInput = document.getElementById('start-search-date') as HTMLInputElement;
   const endSearchDateInput = document.getElementById('end-search-date') as HTMLInputElement;
+  const maxSearchResultsInput = document.getElementById('max-search-results') as HTMLInputElement;
 
   loadDateFromSettings();
-  setInitialSearchDates();
   setInputBadgetIfEndDateIsSet();
 
   submitButton.addEventListener('click', function () {
@@ -20,10 +20,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const startSearchDate = startSearchDateInput.value;
     const endSearchDate = endSearchDateInput.value;
+    const maxSearchResults = maxSearchResultsInput.value;
 
     chrome.storage.local.set({ startSearchDate: startSearchDate }).then(() => {});
 
     chrome.storage.session.set({ endSearchDate: endSearchDate }).then(() => {});
+
+    chrome.storage.local.set({ maxSearchResults: maxSearchResults }).then(() => {});
 
     showNotification('Settings saved!');
     setInputBadgetIfEndDateIsSet();
@@ -33,6 +36,8 @@ document.addEventListener('DOMContentLoaded', function () {
     chrome.storage.local.get(['startSearchDate'], function (result) {
       if (result) {
         startSearchDateInput.value = result.startSearchDate;
+      } else {
+        setInitialOptions();
       }
     });
 
@@ -41,14 +46,32 @@ document.addEventListener('DOMContentLoaded', function () {
         endSearchDateInput.value = result.endSearchDate;
       }
     });
+
+    chrome.storage.local.get(['maxSearchResults'], function (result) {
+      console.log('from store', result.maxSearchResults);
+
+      if (result.maxSearchResults) {
+        maxSearchResultsInput.value = result.maxSearchResults;
+      } else {
+        setInitialOptions();
+      }
+    });
   }
 
-  function setInitialSearchDates() {
+  function setInitialOptions() {
     if (!startSearchDateInput.value) {
       startSearchDateInput.value = subYears(new Date(), 1).toISOString().split('T')[0];
     }
 
     chrome.storage.local.set({ startSearchDate: startSearchDateInput.value }).then(() => {});
+
+    if (!maxSearchResultsInput.value) {
+      maxSearchResultsInput.value = '500';
+    }
+
+    console.log(maxSearchResultsInput.value);
+
+    chrome.storage.local.set({ maxSearchResults: maxSearchResultsInput.value }).then(() => {});
   }
 
   function showNotification(message: string) {

@@ -6,7 +6,7 @@ body {
   margin: 0;
 }
 
-.form {
+.row {
   display: flex;
   justify-content: space-between;
   gap: 20px;
@@ -34,6 +34,22 @@ body {
 }
 
 .date-picker {
+  width: 100%;
+  padding: 8px;
+  margin: 10px 0 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+
+  &:hover,
+  &:focus {
+    border-color: #999;
+  }
+
+  @include badge(4px, 3px);
+}
+
+.number-input {
   width: 100%;
   padding: 8px;
   margin: 10px 0 5px;
