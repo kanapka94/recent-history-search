@@ -13,13 +13,15 @@ document.addEventListener('DOMContentLoaded', function () {
     startSearchTimestamp = new Date(result).getTime();
   });
 
-  getEndSearchDate().then((result) => {
-    endSearchTimestamp = new Date(result).getTime();
+  getEndSearchDate().then((result: string) => {
+    endSearchTimestamp = !result ? new Date().getTime() : new Date(result).getTime();
   });
 
   chrome.tabs.getCurrent(function (tab) {
     searchInput.focus();
   });
+
+  setButtonBadgeIfEndDateIsSet();
 
   function displayHistoryResults() {
     chrome.history.search({ text: '', maxResults: 200 }, function (results) {
@@ -89,11 +91,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function getAllHistoryResults(query: string, callback: Callback) {
     var startTime = startSearchTimestamp;
-    var endTime = Date.now();
+    var endTime = endSearchTimestamp;
     var resultsSoFar = [];
 
     chrome.history.search(
-      { text: query, startTime: startTime, endTime: endTime, maxResults: 500 },
+      { text: query, startTime: startTime, endTime: endTime, maxResults: 2000 },
       function (results) {
         resultsSoFar = resultsSoFar.concat(results);
 
@@ -160,7 +162,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function getEndSearchDate() {
     return new Promise((resolve) => {
-      chrome.storage.local.get(['endSearchDate'], function (result) {
+      chrome.storage.session.get(['endSearchDate'], function (result) {
         resolve(result.endSearchDate);
       });
     });
@@ -200,15 +202,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const lastVisit = document.createElement('p');
     lastVisit.classList.add('last-visit');
-    lastVisit.textContent = formatDistance(new Date(item.lastVisitTime), new Date(), {
-      addSuffix: true,
-    });
+
+    if (item.lastVisitTime) {
+      lastVisit.textContent = formatDistance(new Date(item.lastVisitTime), new Date(), {
+        addSuffix: true,
+      });
+    }
 
     listItem.appendChild(Container);
     listItem.appendChild(lastVisit);
 
     listItem.setAttribute('data-url', item.url);
     listItem.addEventListener('click', function () {
+      if (!item.lastVisitTime) {
+        chrome.tabs.update(item.id, { active: true });
+        return;
+      }
+
       chrome.tabs.create({ url: item.url });
     });
 
@@ -226,5 +236,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function navigateToSettings() {
     chrome.runtime.openOptionsPage();
+  }
+
+  function setButtonBadgeIfEndDateIsSet() {
+    getEndSearchDate().then((result) => {
+      if (result) {
+        SettingsButton.classList.add('badge');
+      }
+    });
   }
 });

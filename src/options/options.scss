@@ -1,5 +1,9 @@
+@import '../shared/style.scss';
+
 body {
   width: 700px;
+  padding: 20px;
+  margin: 0;
 }
 
 .form {
@@ -41,6 +45,8 @@ body {
   &:focus {
     border-color: #999;
   }
+
+  @include badge(4px, 3px);
 }
 
 .save-settings {
@@ -68,4 +74,31 @@ body {
 .separator {
   margin: 20px 0;
   border-bottom: 1px solid #ccc;
+}
+
+#notification {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 10px;
+  background-color: #499875;
+  color: white;
+  text-align: center;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s, opacity 0.1s ease-out;
+
+  &.show {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  &.error {
+    background-color: #d9534f;
+  }
+
+  &.warning {
+    background-color: #f0ad4e;
+  }
 }

@@ -11,13 +11,13 @@
 
     <form id="settings-form" class="form">
       <div class="column">
-        <label for="start-search-date" class="label">Search from:</label>
+        <label for="start-search-date" class="label">Search from</label>
         <input type="date" id="start-search-date" name="start-search-date" class="date-picker" />
         <p class="info">Select the start date from which you want to display the results</p>
         <p class="info">Default: <span class="highlight">1 year ago</span></p>
       </div>
       <div class="column">
-        <label for="end-search-date" class="label">to:</label>
+        <label for="end-search-date" class="label">to</label>
         <input type="date" id="end-search-date" name="end-search-date" class="date-picker" />
         <p class="info">Select the end date by which you want to display the results.</p>
         <p class="info">Default: <span class="highlight">today</span></p>
@@ -29,6 +29,8 @@
     <button type="submit" id="submit" class="save-settings" data-trigger="save-settings">
       Save
     </button>
+
+    <div id="notification"></div>
 
     <script type="module" src="./options.ts"></script>
   </body>

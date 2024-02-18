@@ -7,8 +7,9 @@ document.addEventListener('DOMContentLoaded', function () {
   const startSearchDateInput = document.getElementById('start-search-date') as HTMLInputElement;
   const endSearchDateInput = document.getElementById('end-search-date') as HTMLInputElement;
 
-  setDateFromSettings();
+  loadDateFromSettings();
   setInitialSearchDates();
+  setInputBadgetIfEndDateIsSet();
 
   submitButton.addEventListener('click', function () {
     elForm.dispatchEvent(new Event('submit'));
@@ -20,19 +21,24 @@ document.addEventListener('DOMContentLoaded', function () {
     const startSearchDate = startSearchDateInput.value;
     const endSearchDate = endSearchDateInput.value;
 
-    chrome.storage.local.set({ startSearchDate: startSearchDate }).then(() => {
-      console.log('Zapisano datę: ' + startSearchDate);
-    });
+    chrome.storage.local.set({ startSearchDate: startSearchDate }).then(() => {});
 
-    chrome.storage.local.set({ endSearchDate: endSearchDate }).then(() => {
-      console.log('Zapisano datę: ' + endSearchDate);
-    });
+    chrome.storage.session.set({ endSearchDate: endSearchDate }).then(() => {});
+
+    showNotification('Settings saved!');
+    setInputBadgetIfEndDateIsSet();
   });
 
-  function setDateFromSettings() {
+  function loadDateFromSettings() {
     chrome.storage.local.get(['startSearchDate'], function (result) {
       if (result) {
         startSearchDateInput.value = result.startSearchDate;
+      }
+    });
+
+    chrome.storage.session.get(['endSearchDate'], function (result) {
+      if (result.endSearchDate) {
+        endSearchDateInput.value = result.endSearchDate;
       }
     });
   }
@@ -42,16 +48,32 @@ document.addEventListener('DOMContentLoaded', function () {
       startSearchDateInput.value = subYears(new Date(), 1).toISOString().split('T')[0];
     }
 
-    if (!endSearchDateInput.value) {
-      endSearchDateInput.value = new Date().toISOString().split('T')[0];
-    }
+    chrome.storage.local.set({ startSearchDate: startSearchDateInput.value }).then(() => {});
+  }
 
-    chrome.storage.local.set({ startSearchDate: startSearchDateInput.value }).then(() => {
-      console.log('Zapisano datę: ' + startSearchDateInput.value);
-    });
+  function showNotification(message: string) {
+    const notification = document.getElementById('notification') as HTMLDivElement;
+    notification.textContent = message;
+    notification.classList.add('show');
 
-    chrome.storage.local.set({ endSearchDate: endSearchDateInput.value }).then(() => {
-      console.log('Zapisano datę: ' + endSearchDateInput.value);
+    setTimeout(() => {
+      notification.classList.remove('show');
+    }, 3000);
+  }
+
+  function setInputBadgetIfEndDateIsSet() {
+    const element = document.getElementById('end-search-date') as HTMLInputElement;
+
+    chrome.storage.session.get(['endSearchDate'], function (result) {
+      if (result.endSearchDate) {
+        element.classList.add('badge');
+      } else {
+        element.classList.remove('badge');
+      }
     });
+  }
+
+  function getDefaultEndDate() {
+    return new Date().toISOString().split('T')[0];
   }
 });

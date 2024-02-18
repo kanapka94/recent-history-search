@@ -1,0 +1,17 @@
+@mixin badge($top: -5px, $right: -5px, $color: rgb(0, 157, 255)) {
+  &.badge {
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: $top;
+      right: $right;
+      width: 7px;
+      height: 7px;
+      background-color: $color;
+      border-radius: 50%;
+      text-align: center;
+    }
+  }
+}

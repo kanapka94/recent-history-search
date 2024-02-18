@@ -1,3 +1,5 @@
+@import '../shared/style.scss';
+
 * {
   box-sizing: border-box;
 }
@@ -26,7 +28,7 @@ body {
 }
 
 input[type='text'] {
-  width: 93%;
+  width: 92%;
   padding: 8px;
   margin-bottom: 10px;
   border: none;
@@ -41,7 +43,7 @@ input[type='text'] {
 .settings-button {
   position: absolute;
   right: 10px;
-  top: 9px;
+  top: 8px;
   padding: 6px;
   border-radius: 50%;
   border: none;
@@ -54,6 +56,8 @@ input[type='text'] {
     background: #f0f0f0;
     transition: background-color 0.3s ease;
   }
+
+  @include badge(2px, 0);
 }
 
 .settings-icon {
