@@ -2,7 +2,7 @@
 
 body {
   width: 700px;
-  padding: 20px;
+  padding: 20px 20px 0;
   margin: 0;
 }
 
@@ -33,22 +33,7 @@ body {
   font-weight: bold;
 }
 
-.date-picker {
-  width: 100%;
-  padding: 8px;
-  margin: 10px 0 5px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-
-  &:hover,
-  &:focus {
-    border-color: #999;
-  }
-
-  @include badge(4px, 3px);
-}
-
+.date-picker,
 .number-input {
   width: 100%;
   padding: 8px;
