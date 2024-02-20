@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function loadDateFromSettings() {
     chrome.storage.local.get(['startSearchDate'], function (result) {
-      if (result) {
+      if (result.startSearchDate) {
         startSearchDateInput.value = result.startSearchDate;
       } else {
         setInitialOptions();
@@ -90,9 +90,5 @@ document.addEventListener('DOMContentLoaded', function () {
         element.classList.remove('badge');
       }
     });
-  }
-
-  function getDefaultEndDate() {
-    return new Date().toISOString().split('T')[0];
   }
 });

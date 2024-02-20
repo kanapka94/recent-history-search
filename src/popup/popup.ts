@@ -1,4 +1,4 @@
-import { formatDistance } from 'date-fns';
+import { formatDistance, subYears } from 'date-fns';
 
 document.addEventListener('DOMContentLoaded', function () {
   var searchInput = document.getElementById('searchInput');
@@ -10,17 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
   let endSearchTimestamp = undefined;
   let searchMaxResults = undefined;
 
-  getStartSearchDate().then((result) => {
-    startSearchTimestamp = new Date(result).getTime();
-  });
-
-  getEndSearchDate().then((result: string) => {
-    endSearchTimestamp = !result ? new Date().getTime() : new Date(result).getTime();
-  });
-
-  getSearchMaxResults().then((result) => {
-    searchMaxResults = Number(result);
-  });
+  getOptions();
 
   chrome.tabs.getCurrent(function (tab) {
     searchInput.focus();
@@ -243,6 +233,39 @@ document.addEventListener('DOMContentLoaded', function () {
     getEndSearchDate().then((result) => {
       if (result) {
         SettingsButton.classList.add('badge');
+      }
+    });
+  }
+
+  function getOptions() {
+    const DEFAULT_START_DATE = subYears(new Date(), 1).toISOString().split('T')[0];
+    const DEFAULT_MAX_RESULTS = 500;
+
+    chrome.storage.local.get(['startSearchDate'], function (result) {
+      if (!result.startSearchDate) {
+        chrome.storage.local.set({
+          startSearchDate: DEFAULT_START_DATE,
+        });
+        startSearchTimestamp = new Date(DEFAULT_START_DATE).getTime();
+      } else {
+        startSearchTimestamp = new Date(result.startSearchDate).getTime();
+      }
+    });
+
+    chrome.storage.local.get(['endSearchDate'], function (result) {
+      if (!result.endSearchDate) {
+        endSearchTimestamp = new Date().getTime();
+      } else {
+        endSearchTimestamp = new Date(result.endSearchDate).getTime();
+      }
+    });
+
+    chrome.storage.local.get(['maxSearchResults'], function (result) {
+      if (!result.maxSearchResults) {
+        chrome.storage.local.set({ maxSearchResults: DEFAULT_MAX_RESULTS });
+        searchMaxResults = DEFAULT_MAX_RESULTS;
+      } else {
+        searchMaxResults = Number(result.maxSearchResults);
       }
     });
   }
