@@ -4,6 +4,7 @@
   "version": "0.0.3",
   "description": "Chrome extension for searching recently closed and history tabs with navigation using arrow keys and date filters.",
   "permissions": ["tabs", "history", "favicon", "storage"],
+  "default_locale": "en",
   "action": {
     "default_popup": "./popup/popup.html",
     "default_icon": {
