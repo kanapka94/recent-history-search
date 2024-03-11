@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Recent history search",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Chrome extension for searching recently closed and history tabs with navigation using arrow keys and date filters.",
   "permissions": ["tabs", "history", "favicon", "storage"],
   "default_locale": "en",
